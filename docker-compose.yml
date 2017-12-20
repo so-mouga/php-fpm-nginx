@@ -1,0 +1,33 @@
+version: "2"
+services:
+  nginx:
+      build:
+          context: ./nginx
+      ports:
+          - "8080:80"
+      volumes:
+          - ./app:/var/app
+      links:
+          - fpm
+  fpm:
+      build:
+          context: ./fpm
+      volumes:
+          - ./app:/var/app
+      expose:
+          - "9000"
+  db:
+      image: mysql:5.5
+      environment:
+            MYSQL_ROOT_PASSWORD: root 
+            MYSQL_USER: root
+            MYSQL_DATABASE: "test"
+      volumes:
+        - ./database/:/docker-entrypoint-initdb.d:ro
+
+  db_admin:
+          image: adminer
+          links:
+              - db
+          ports:
+              - 8081:8080
